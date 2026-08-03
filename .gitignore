@@ -1,0 +1,23 @@
+# Project data and generated outputs
+data/
+results/
+logs/
+docs/reports/*.html
+docs/reports/*.pdf
+
+# R and Python runtime files
+.Rhistory
+.RData
+.Rproj.user/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+
+# Local environment and editor files
+.env
+.venv/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
