@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hongf-cellphonedb-workflow"
+version = "0.2.0"
+description = "Standalone CellPhoneDB v5 workflow for annotated h5ad files"
+requires-python = ">=3.10,<3.13"
+dependencies = [
+  "anndata>=0.10",
+  "cellphonedb>=5",
+  "ktplotspy>=0.2",
+  "matplotlib>=3.8",
+  "pandas>=2.0",
+  "scipy>=1.10",
+]
+
+[project.scripts]
+cellphonedb-workflow = "cellphonedb_workflow:main"
+
+[tool.setuptools]
+py-modules = ["cellphonedb_workflow"]
