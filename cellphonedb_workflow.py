@@ -15,7 +15,11 @@ import anndata as ad
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+from matplotlib.colors import LinearSegmentedColormap
 from scipy import sparse
+
+
+NPG_SEQUENTIAL = ["#FFF5F0", "#F39B7F", "#E64B35", "#7A0019"]
 
 
 # 功能：读取主流程输出，并选取 CellPhoneDB 使用的表达层。
@@ -115,13 +119,13 @@ def run_cellphonedb(args: argparse.Namespace, counts_path: Path, metadata_path: 
     )
 
 
-# 功能：把当前 Matplotlib 图成对保存为 PDF 和 300 dpi PNG。
+# 功能：把当前 Matplotlib 图成对保存为 PDF 和 600 dpi PNG。
 def save_matplotlib(stem: Path, width: float, height: float) -> None:
     figure = plt.gcf()
     figure.set_size_inches(width, height)
     figure.tight_layout()
     figure.savefig(stem.with_suffix(".pdf"), bbox_inches="tight")
-    figure.savefig(stem.with_suffix(".png"), dpi=300, bbox_inches="tight")
+    figure.savefig(stem.with_suffix(".png"), dpi=600, bbox_inches="tight")
     plt.close(figure)
 
 
@@ -140,9 +144,13 @@ def plot_results(
         pvals=pvalues,
         celltype_key=celltype_col,
         figsize=(10, 9),
-        title="Significant ligand-receptor interactions",
+        title="",
         symmetrical=False,
     )
+    cmap = LinearSegmentedColormap.from_list("npg_sequential", NPG_SEQUENTIAL)
+    for axis in plt.gcf().axes:
+        for artist in [*axis.collections, *axis.images]:
+            artist.set_cmap(cmap)
     save_matplotlib(output / "interaction_count_heatmap", 10, 9)
 
     bubble = kpy.plot_cpdb(
@@ -153,17 +161,20 @@ def plot_results(
         pvals=pvalues,
         celltype_key=celltype_col,
         figsize=(14, 10),
-        title="Ligand-receptor interactions",
+        title="",
         max_size=6,
         highlight_size=0.75,
         standard_scale=True,
     )
+    from plotnine import scale_color_gradientn
+
+    bubble += scale_color_gradientn(colors=NPG_SEQUENTIAL)
     bubble.save(str(output / "ligand_receptor_bubble.pdf"), width=14, height=10, verbose=False)
     bubble.save(
         str(output / "ligand_receptor_bubble.png"),
         width=14,
         height=10,
-        dpi=300,
+        dpi=600,
         verbose=False,
     )
 
