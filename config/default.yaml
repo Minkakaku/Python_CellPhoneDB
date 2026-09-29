@@ -1,0 +1,4 @@
+methods:
+  cellphonedb:
+    celltype-col: cell_type
+    species: human

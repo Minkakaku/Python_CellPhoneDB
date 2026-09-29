@@ -1,36 +1,60 @@
-# Python-cellphonedb-workflow-template
+# Python_CellPhoneDB
 
-独立 CellPhoneDB v5 分析点。正式代码只有根目录的 cellphonedb_workflow.py，直接接收主 Scanpy 流程生成的注释后 h5ad。
+跨项目复用的 Python 公共分析代码库。仓库管理公共方法、默认配置、环境和项目示例；实际项目在 `projects/<项目名>/` 使用这些方法，数据和运行产物不提交 Git。
 
-## 正式流程
+## 目录
 
-1. 从 h5ad 选择非负、未中心化的表达层。
-2. 小鼠数据按显式同源表转换成人基因；many-to-one 映射按表达量求和。
-3. 生成 CellPhoneDB metadata 并运行 statistical_analysis。
-4. 保存完整结果表、通讯数量热图、配体-受体气泡图和中文说明。
+```text
+src/python/       公共分析方法与配置加载器
+config/            公共默认参数与参考配置
+envs/              共享环境定义
+projects/project1/ 示例项目（未运行）
+  config/          项目覆盖、样本表、QC/注释等人工决策
+  workflow/        编号短脚本与分阶段 runner
+  data/processed/  中间对象
+  data/reference/  项目参考资源
+  results/         按分析点保存图表与中文说明
+  logs/            运行记录
+tests/             路径和项目配置检查
+```
 
-CellPhoneDB v5 的 cpdb_statistical_analysis_method.call() 返回结果字典；正式脚本按 means、pvalues、significant_means 等键保存，不能按四个位置返回值解包。
+## 新项目
 
-## 运行
+在仓库根目录执行：
 
-    conda env create -f environment.yml
-    conda activate cellphonedb-workflow
-    pip install -e .
+```bash
+conda env create -f envs/environment.yaml
+python -m pip install -e .
+cp -R projects/project1 projects/my_project
+```
 
-    cellphonedb-workflow --input annotated.h5ad --database cellphonedb.zip --output results/cellphonedb --celltype-col cell_type --species human
+修改 `projects/my_project/config/config.yaml` 和样本/注释表，准备输入对象与参考文件。示例中的物种、reference、root、分组和文件名必须按真实项目核对，不能直接作为生物学结论。
 
-小鼠数据增加：
+每个编号脚本可单独执行；脚本从自身位置定位项目，因此复制后不会继续写入 project1。Python 包项目先完成 editable install。
 
-    cellphonedb-workflow --input annotated_mouse.h5ad --database cellphonedb.zip --output results/cellphonedb --celltype-col cell_type --species mouse --homology mouse_human_homology.tsv
+```bash
+python projects/my_project/workflow/10_cellphonedb.py
+```
 
-映射表默认需要 mouse_gene 和 human_gene 两列。可用 --mouse-col、--human-col 修改列名。
+可用步骤：
+- `10_cellphonedb.py`
 
-## 关键解释
+`run_all.sh` 对主流程只运行到 QC 检查点；独立分析方法需显式选择步骤，避免把不同候选方法混为同一条流程。已运行脚本不改写，重跑新增编号并使用新输出目录。
 
-- 官方默认 threshold=0.1：配体/受体需在对应细胞群至少 10% 细胞表达。
-- statistical analysis 的 P 值来自细胞标签置换，用于细胞对特异性，不是跨样本 CON/EXP 显著性。
-- 条件比较应按生物学样本分别运行，再在样本层面汇总。
-- 微环境文件可限制组织中不可能相遇的细胞类型组合。
-- legacy/original/ 和 source_catalog/ 仅用于来源追溯，不是正式入口。
+## 配置与路径
 
-方法依据：CellPhoneDB 官方结果文档与方法论文（PMID: 32103204）。
+公共 `config/default.yaml` → `config/reference.yaml` → 项目 `config/config.yaml`，后者覆盖前者。嵌套映射按键合并，列表和标量整体替换。共享方法接收配置/参数，不包含实际项目路径与样本名。项目相对输入输出路径以项目目录为基准；参考文件路径写在配置中。
+
+## 结果与解释
+
+最终图保存同名 PNG/PDF，配套 CSV/TSV 和 `README_results_CN.md` 放在分析点结果目录。中间对象放在 `data/processed/`。细胞或空间 bins 不作为独立生物学重复；条件比较用样本级汇总。方法特有约束见 [AGENTS.md](AGENTS.md) 和公共代码注释。
+
+## 验证
+
+```bash
+python tests/test_project_layout.py
+```
+
+此检查验证配置、路径或安全导入，不运行真实组学分析。完整分析需要对应生信依赖、真实输入数据和人工 QC/注释。
+
+检查独立入口参数而不运行分析：`python projects/my_project/workflow/10_cellphonedb.py --dry-run`。

@@ -1,0 +1,5 @@
+methods:
+  cellphonedb:
+    input: data/processed/annotated.h5ad
+    database: data/reference/cellphonedb.zip
+    output: results/10_cellphonedb

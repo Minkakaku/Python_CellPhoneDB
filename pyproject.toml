@@ -20,4 +20,5 @@ dependencies = [
 cellphonedb-workflow = "cellphonedb_workflow:main"
 
 [tool.setuptools]
+package-dir = {"" = "src/python"}
 py-modules = ["cellphonedb_workflow"]

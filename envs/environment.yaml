@@ -1,0 +1,16 @@
+name: python-cellphonedb
+channels:
+- conda-forge
+- bioconda
+dependencies:
+- python=3.11
+- anndata>=0.10
+- matplotlib>=3.8
+- pandas>=2.0
+- scipy>=1.10
+- pip
+- pip:
+  - cellphonedb>=5
+  - ktplotspy>=0.2
+  - -e .
+- pyyaml
