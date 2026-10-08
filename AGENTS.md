@@ -14,3 +14,4 @@
 - 最终图成对保存 PNG/PDF，结果表和 README_results_CN.md 放同一输出目录。
 - CellPhoneDB 标签置换 P 值不能解释为跨生物学样本显著性。
 - legacy/original/ 和 source_catalog/ 保持原字节。
+- 项目目录统一使用小写 `projects/`；默认分类配色使用固定 NPG 色序，连续与双向数值使用 NPG 衍生渐变，项目显式配色可覆盖默认值。
