@@ -166,9 +166,12 @@ def plot_results(
         highlight_size=0.75,
         standard_scale=True,
     )
-    from plotnine import scale_color_gradientn
+    from plotnine import element_blank, scale_color_gradientn, theme
 
-    bubble += scale_color_gradientn(colors=NPG_SEQUENTIAL)
+    # 通讯气泡点图不显示主/次内部网格，保留原有外框。
+    bubble += scale_color_gradientn(colors=NPG_SEQUENTIAL) + theme(
+        panel_grid_major=element_blank(), panel_grid_minor=element_blank()
+    )
     bubble.save(str(output / "ligand_receptor_bubble.pdf"), width=14, height=10, verbose=False)
     bubble.save(
         str(output / "ligand_receptor_bubble.png"),
